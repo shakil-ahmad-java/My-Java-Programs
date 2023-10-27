@@ -1,0 +1,55 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.4/xlsx.full.min.js"></script>
+
+<script>
+function exportToExcel() {
+    const table = document.getElementById("myTable");
+
+    // Create an empty array to hold the data
+    const data = [];
+
+    // Create an array to store the column headings
+    const headings = [];
+
+    // Loop through the table rows
+    for (let row of table.getElementsByTagName("tr")) {
+        const rowData = [];
+        // Loop through the row's cells
+        for (let cell of row.getElementsByTagName("td")) {
+            const select = cell.querySelector("select");
+            if (select) {
+                // If the cell contains a select element, push its selected value
+                rowData.push(select.value);
+            } else {
+                // If it's not a select element, push the input value
+                const input = cell.querySelector("input");
+                if (input) {
+                    rowData.push(input.value);
+                } else {
+                    // Handle other types of cells as needed
+                    rowData.push(cell.textContent.trim());
+                }
+            }
+        }
+        data.push(rowData);
+    }
+
+    // Loop through the table header row to extract headings
+    const headerRow = table.querySelector("thead tr");
+    for (let cell of headerRow.getElementsByTagName("th")) {
+        headings.push(cell.textContent);
+    }
+
+    // Add the headings as the first row in the data
+    data.unshift(headings);
+
+    // Create a worksheet with the data
+    const ws = XLSX.utils.aoa_to_sheet(data);
+
+    // Create a workbook and add the worksheet
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+
+    // Generate the Excel file
+    XLSX.writeFile(wb, "table_data.xlsx");
+}
+</script>
